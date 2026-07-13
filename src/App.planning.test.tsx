@@ -63,7 +63,7 @@ describe('App — planning', () => {
     await user.type(screen.getByLabelText(/^amount$/i), '50');
     await user.click(screen.getByRole('button', { name: /add recurring item/i }));
 
-    expect(screen.getByText(/please select bill\/expense or income/i)).toBeInTheDocument();
+    expect(screen.getByText(/please select expense or income/i)).toBeInTheDocument();
     expect(screen.queryByText(/all recurring items/i)).not.toBeInTheDocument();
   });
 

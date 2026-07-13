@@ -1,11 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTransactionsStore } from './lib/useTransactionsStore';
 import { useCurrency } from './lib/useCurrency';
 import { useRecurringStore } from './lib/useRecurringStore';
+import { useTheme } from './lib/useTheme';
 import { filterByDateRange, calculateTotals, groupByCategory, monthlyTrend } from './lib/calculations';
 import { getUpcomingOccurrences, projectedBalance } from './lib/planning';
 import { todayKey } from './lib/date';
 import type { Transaction } from './lib/types';
+import type { TransactionInput } from './lib/useTransactionsStore';
+import { LanguageProvider, useTranslation } from './lib/i18n';
 import { SummaryCards } from './components/SummaryCards';
 import { CategoryPieChart } from './components/CategoryPieChart';
 import { MonthlyTrendChart } from './components/MonthlyTrendChart';
@@ -14,20 +17,25 @@ import { TransactionList } from './components/TransactionList';
 import { DateRangeFilter } from './components/DateRangeFilter';
 import { CsvControls } from './components/CsvControls';
 import { CurrencySelector } from './components/CurrencySelector';
+import { LanguageSelector } from './components/LanguageSelector';
+import { ThemeToggle } from './components/ThemeToggle';
 import { RecurringItemForm } from './components/RecurringItemForm';
 import { UpcomingList } from './components/UpcomingList';
 import { ProjectionCard } from './components/ProjectionCard';
 
 const PLANNING_WINDOW_DAYS = 30;
 
-function App() {
+function AppContent() {
+  const { t } = useTranslation();
   const { transactions, addTransaction, updateTransaction, deleteTransaction, importTransactions, makeId } =
     useTransactionsStore();
   const { currency, setCurrency } = useCurrency();
+  const { theme, toggleTheme } = useTheme();
   const { items: recurringItems, addRecurringItem, deleteRecurringItem } = useRecurringStore();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const formSectionRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(
     () => filterByDateRange(transactions, startDate || null, endDate || null),
@@ -53,7 +61,18 @@ function App() {
 
   function handleEdit(transaction: Transaction) {
     setEditingTransaction(transaction);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll the form into view where it already lives on the page, instead
+    // of jumping to the very top (which would show the header, not the form).
+    if (typeof formSectionRef.current?.scrollIntoView === 'function') {
+      formSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function handleUpdate(id: string, input: TransactionInput) {
+    updateTransaction(id, input);
+    // Without this, the form stayed in "edit mode" after saving — the data
+    // updated correctly, but it looked like nothing happened.
+    setEditingTransaction(null);
   }
 
   function handleDelete(id: string) {
@@ -66,17 +85,19 @@ function App() {
       <header className="mx-auto max-w-6xl px-6 pt-10 sm:px-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">Ledger</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-              Expense Dashboard
-            </h1>
-            <p className="mt-1 max-w-md text-sm text-ink-muted">
-              Track income and spending, broken down by category and month.
-            </p>
+            <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">{t('appName')}</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-ink sm:text-4xl">{t('appTitle')}</h1>
+            <p className="mt-1 max-w-md text-sm text-ink-muted">{t('appSubtitle')}</p>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <CsvControls transactions={transactions} onImport={importTransactions} makeId={makeId} />
-            <CurrencySelector currency={currency} onChange={setCurrency} />
+            <div className="flex items-center gap-2">
+              <ThemeToggle theme={theme} onToggle={toggleTheme} />
+              <CsvControls transactions={transactions} onImport={importTransactions} makeId={makeId} />
+            </div>
+            <div className="flex items-center gap-3">
+              <CurrencySelector currency={currency} onChange={setCurrency} />
+              <LanguageSelector />
+            </div>
           </div>
         </div>
       </header>
@@ -96,17 +117,17 @@ function App() {
         <SummaryCards totals={totals} currency={currency} />
 
         <div className="grid gap-4 lg:grid-cols-2">
-          <CategoryPieChart data={expenseByCategory} title="Spending by category" currency={currency} />
-          <CategoryPieChart data={incomeByCategory} title="Income by category" currency={currency} />
+          <CategoryPieChart data={expenseByCategory} title={t('spendingByCategory')} currency={currency} />
+          <CategoryPieChart data={incomeByCategory} title={t('incomeByCategory')} currency={currency} />
         </div>
 
         <MonthlyTrendChart data={trend} currency={currency} />
 
-        <div className="grid gap-4 lg:grid-cols-[380px_1fr]">
+        <div ref={formSectionRef} className="grid gap-4 lg:grid-cols-[380px_1fr] scroll-mt-6">
           <TransactionForm
             key={editingTransaction?.id ?? 'new'}
             onAdd={addTransaction}
-            onUpdate={updateTransaction}
+            onUpdate={handleUpdate}
             editingTransaction={editingTransaction}
             onCancelEdit={() => setEditingTransaction(null)}
             homeCurrency={currency}
@@ -121,12 +142,10 @@ function App() {
         </div>
 
         <div className="border-t border-border pt-6">
-          <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">Planning</p>
-          <h2 className="mt-1 text-xl font-bold text-ink">Recurring bills &amp; income</h2>
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">{t('planning')}</p>
+          <h2 className="mt-1 text-xl font-bold text-ink">{t('recurringBillsIncome')}</h2>
           <p className="mt-1 max-w-xl text-sm text-ink-muted">
-            Add anything that happens on a fixed day every month — rent, a paycheck, a
-            subscription — to see how your balance is projected to look over the next{' '}
-            {PLANNING_WINDOW_DAYS} days.
+            {t('planningDescription', { days: PLANNING_WINDOW_DAYS })}
           </p>
 
           <div className="mt-4 grid gap-4 lg:grid-cols-[380px_1fr]">
@@ -150,11 +169,17 @@ function App() {
       </main>
 
       <footer className="mx-auto max-w-6xl px-6 pb-10 sm:px-8">
-        <p className="text-xs uppercase tracking-wide text-ink-muted">
-          Data lives only in this browser's local storage — nothing is sent anywhere.
-        </p>
+        <p className="text-xs uppercase tracking-wide text-ink-muted">{t('footerNote')}</p>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }
 

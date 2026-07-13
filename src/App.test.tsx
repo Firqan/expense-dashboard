@@ -145,6 +145,28 @@ describe('App', () => {
     expect(screen.getAllByText('-$20.00').length).toBeGreaterThan(0);
   });
 
+  it('regression: exits edit mode after saving, instead of staying stuck on "Save changes"', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /^expense$/i }));
+    await user.type(screen.getByLabelText(/amount/i), '20');
+    await user.type(screen.getByLabelText(/description/i), 'Coffee');
+    await user.click(screen.getByRole('button', { name: /add transaction/i }));
+
+    await user.click(screen.getByRole('button', { name: /edit transaction: coffee/i }));
+    expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
+
+    const amountInput = screen.getByLabelText(/amount/i) as HTMLInputElement;
+    await user.clear(amountInput);
+    await user.type(amountInput, '30');
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+
+    // The form should have returned to "Add transaction" mode, not stayed on "Save changes".
+    expect(screen.getByRole('button', { name: /add transaction/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /save changes/i })).not.toBeInTheDocument();
+  });
+
   it('converts a foreign-currency transaction into the home currency', async () => {
     const user = userEvent.setup();
     render(<App />);

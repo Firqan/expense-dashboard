@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-bg: #f7f7f5;
   --color-surface: #ffffff;
@@ -25,9 +27,36 @@
   --font-mono: "Space Mono", ui-monospace, monospace;
 }
 
+/*
+ * Dark theme: overriding the same CSS custom properties inside a `.dark`
+ * scope means every component that already uses `bg-surface`, `text-ink`,
+ * `border-border`, etc. automatically switches palette — no component
+ * needed a single dark: class added to it.
+ */
+html.dark {
+  --color-bg: #10141a;
+  --color-surface: #1a1f27;
+  --color-border: #2a303a;
+  --color-ink: #e7e9ee;
+  --color-ink-muted: #8b93a1;
+
+  --color-income: #34d399;
+  --color-income-tint: #103b2c;
+  --color-expense: #f87171;
+  --color-expense-tint: #3f1d1d;
+}
+
 @layer base {
   * {
     box-sizing: border-box;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
@@ -35,6 +64,7 @@
     font-family: var(--font-sans);
     background-color: var(--color-bg);
     color: var(--color-ink);
+    transition: background-color 0.15s ease, color 0.15s ease;
   }
 
   :focus-visible {
@@ -56,4 +86,9 @@
 .font-numeric {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  /* Keep amounts/signs/symbols in a stable left-to-right order even when
+     the surrounding page is RTL (Arabic/Persian) — otherwise the bidi
+     algorithm can visually reorder a minus sign or currency symbol. */
+  direction: ltr;
+  unicode-bidi: isolate;
 }

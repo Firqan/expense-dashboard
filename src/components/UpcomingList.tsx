@@ -1,6 +1,8 @@
 import type { RecurringItem } from '../lib/types';
 import type { Occurrence } from '../lib/planning';
 import { formatCurrency } from '../lib/calculations';
+import { useTranslation } from '../lib/i18n';
+import { categoryLabel } from '../lib/categoryLabels';
 
 interface UpcomingListProps {
   occurrences: Occurrence[];
@@ -10,6 +12,8 @@ interface UpcomingListProps {
 }
 
 export function UpcomingList({ occurrences, allItems, onDelete, currency }: UpcomingListProps) {
+  const { t } = useTranslation();
+
   if (allItems.length === 0) {
     return null;
   }
@@ -18,11 +22,11 @@ export function UpcomingList({ occurrences, allItems, onDelete, currency }: Upco
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
       <div className="border-b border-border px-4 py-2.5">
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-          Upcoming ({occurrences.length})
+          {t('upcoming', { count: occurrences.length })}
         </p>
       </div>
       {occurrences.length === 0 ? (
-        <p className="px-4 py-4 text-sm text-ink-muted">Nothing scheduled in this window.</p>
+        <p className="px-4 py-4 text-sm text-ink-muted">{t('nothingScheduled')}</p>
       ) : (
         <ul>
           {occurrences.map((occ, i) => (
@@ -33,7 +37,9 @@ export function UpcomingList({ occurrences, allItems, onDelete, currency }: Upco
               }`}
             >
               <div>
-                <p className="text-sm font-medium text-ink">{occ.item.description || occ.item.category}</p>
+                <p className="text-sm font-medium text-ink">
+                  {occ.item.description || categoryLabel(occ.item.category, t)}
+                </p>
                 <p className="text-xs text-ink-muted">{occ.date}</p>
               </div>
               <span
@@ -51,13 +57,13 @@ export function UpcomingList({ occurrences, allItems, onDelete, currency }: Upco
 
       <div className="border-t border-border px-4 py-2.5">
         <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
-          All recurring items
+          {t('allRecurringItems')}
         </p>
         <ul className="space-y-1">
           {allItems.map((item) => (
             <li key={item.id} className="group flex items-center justify-between gap-2 text-xs">
               <span className="text-ink-muted">
-                {item.description || item.category} &middot; day {item.dayOfMonth}
+                {item.description || categoryLabel(item.category, t)} &middot; {t('dayOfMonth').toLowerCase()} {item.dayOfMonth}
               </span>
               <button
                 type="button"

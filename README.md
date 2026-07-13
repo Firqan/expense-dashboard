@@ -9,14 +9,16 @@ A clean, chart-driven dashboard for tracking income and expenses: category break
 - **Add income/expense entries** with category, amount, date, and an optional note
 - **Explicit type selection required** — Expense/Income is never pre-selected, so a transaction can't be logged as the wrong type by accident
 - **No future-dated transactions** — the date picker won't accept a date past today
-- **Edit any transaction** — fix a mistake without deleting and re-entering it from scratch
+- **Edit any transaction** — fix a mistake without deleting and re-entering it from scratch. Saving correctly returns the form to its normal state instead of staying stuck in edit mode
 - **Delete with confirmation** — a stray click can't wipe out an entry
-- **Multi-currency**: pick a home currency (persisted, changeable anytime) from a small selector in the header. For a purchase made in a different currency, toggle "This was in a different currency," enter the foreign amount and the exchange rate, and the app computes and stores the home-currency equivalent — while still showing the original amount and rate as a detail on that entry
+- **Multi-currency**: choose from 55 world currencies (persisted, changeable anytime) via a small selector in the header. For a purchase made in a different currency, toggle "This was in a different currency," enter the foreign amount and the exchange rate, and the app computes and stores the home-currency equivalent — while still showing the original amount and rate as a detail on that entry
 - **Recurring bills & income + a 30-day projection**: register anything that happens on a fixed day every month (rent, a paycheck, a subscription) and see how your balance is expected to move over the next 30 days, based on today's actual balance plus what's scheduled to land
 - **Category breakdown** — a donut chart per transaction type (spending vs. income)
-- **Monthly trend** — a bar chart comparing income and expense month over month
+- **Monthly trend** — a bar chart comparing income and expense month over month, with a tooltip that stays put vertically instead of chasing the cursor
 - **Date-range filtering** — every chart, summary card, and list respects the selected range
-- **CSV import/export** — take your data out, or bulk-load transactions from a spreadsheet
+- **CSV import/export that actually opens correctly in Excel** — a UTF-8 byte-order mark and an explicit `sep=` directive are included, so accented characters, non-Latin scripts, and currency symbols render correctly and the columns don't collapse into one under non-US regional settings. The foreign-currency detail (original amount, currency, exchange rate) round-trips through export/import too
+- **Light and dark themes**, toggleable and persisted
+- **7 languages** — English, Arabic, French, German, Kurdish (Kurmanji), Persian, Turkish — switchable from the header, sorted alphabetically by language name and persisted. Arabic and Persian switch the entire page to a right-to-left layout (not just the text) — the same UI, mirrored, not a separate design
 - **Persistence** via `localStorage` — no account, no backend
 - **Tested**: all the money math (totals, category grouping, monthly aggregation, currency conversion, recurring-item projection, CSV parsing) is pure functions with full unit test coverage, independent of the UI
 - **CI/CD**: every push to `main` runs the test suite and deploys to GitHub Pages automatically
@@ -33,7 +35,7 @@ npm run dev       # http://localhost:5173
 ```
 
 ```bash
-npm test           # 61 tests
+npm test           # 81 tests
 npm run build
 ```
 
@@ -43,7 +45,13 @@ Financial UIs live or die on precision, so all monetary figures use a monospaced
 
 The calculation layer (`src/lib/calculations.ts`) is deliberately free of any date-range or UI state — it just takes a list of transactions and returns totals, category sums, or a monthly series. Filtering by date range happens once, upstream, and every chart and summary card consumes the same filtered list. That's what keeps the numbers on screen consistent with each other, and what makes the math independently testable.
 
-CSV parsing (`src/lib/csv.ts`) round-trips through the same format it exports, and it validates every row — a malformed amount or an unrecognized transaction type raises a clear error instead of silently corrupting the ledger.
+CSV parsing (`src/lib/csv.ts`) uses a real character-by-character tokenizer rather than a fixed regex, so it handles quoted fields, embedded commas, and escaped quotes correctly, and looks up columns by name — which is also what lets it stay backward-compatible with exports from before the currency-conversion feature existed. It validates every row: a malformed amount or an unrecognized transaction type raises a clear error instead of silently corrupting the ledger.
+
+Translation (`src/lib/i18n/`) is a small custom context + dictionary system rather than a heavier library, since the app's string set is bounded and known in advance. Category names are a deliberate exception to full translation: a transaction's `category` field always stores the English canonical value (e.g. `"Food"`), and only the on-screen label is translated (`src/lib/categoryLabels.ts`). That keeps CSV exports and imports language-independent — a file exported while using the German UI opens the same way when re-imported under Arabic.
+
+Dark mode doesn't touch component files at all. The color tokens defined in `@theme` are CSS custom properties under the hood; `html.dark { --color-surface: ...; }` simply overrides the same variables, so every existing `bg-surface` / `text-ink` / `border-border` utility class picks up the new palette automatically the moment the `dark` class is toggled on `<html>`.
+
+Right-to-left support follows the same "change one thing at the root, let CSS do the rest" approach: switching to Arabic or Persian sets `dir="rtl"` on `<html>`, and because the layout is built entirely from flexbox and grid (`flex`, `grid`, `gap`, `justify-between`) rather than hardcoded `margin-left` / `text-right` style utilities, the browser mirrors the whole page on its own — no per-component RTL styling was needed. The one exception is monetary figures: `.font-numeric` explicitly forces `direction: ltr` so a negative sign or currency symbol can't get visually reordered by the bidi algorithm inside RTL text.
 
 ## Possible extensions
 

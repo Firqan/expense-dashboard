@@ -3,12 +3,15 @@ import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '../lib/types';
 import type { TransactionType } from '../lib/types';
 import type { RecurringItemInput } from '../lib/useRecurringStore';
 import { todayKey } from '../lib/date';
+import { useTranslation } from '../lib/i18n';
+import { categoryLabel } from '../lib/categoryLabels';
 
 interface RecurringItemFormProps {
   onAdd: (input: RecurringItemInput) => void;
 }
 
 export function RecurringItemForm({ onAdd }: RecurringItemFormProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [type, setType] = useState<TransactionType | null>(null);
   const [amount, setAmount] = useState('');
@@ -65,7 +68,7 @@ export function RecurringItemForm({ onAdd }: RecurringItemFormProps) {
         onClick={() => setIsOpen(true)}
         className="w-full rounded-xl border border-dashed border-border bg-surface py-4 text-sm font-medium text-ink-muted transition-colors hover:border-ink/30 hover:text-ink"
       >
-        + Add a recurring bill or income
+        {t('addRecurringPrompt')}
       </button>
     );
   }
@@ -82,7 +85,7 @@ export function RecurringItemForm({ onAdd }: RecurringItemFormProps) {
               : 'bg-surface text-ink-muted border border-border hover:border-expense/40'
           }`}
         >
-          Bill / Expense
+          {t('billExpense')}
         </button>
         <button
           type="button"
@@ -93,32 +96,30 @@ export function RecurringItemForm({ onAdd }: RecurringItemFormProps) {
               : 'bg-surface text-ink-muted border border-border hover:border-income/40'
           }`}
         >
-          Income
+          {t('income')}
         </button>
       </div>
       {showTypeWarning && (
-        <p className="mt-1.5 text-xs font-medium text-expense">
-          Please select Bill/Expense or Income before continuing.
-        </p>
+        <p className="mt-1.5 text-xs font-medium text-expense">{t('selectTypeWarning')}</p>
       )}
 
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div>
           <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="recurring-description">
-            Name
+            {t('name')}
           </label>
           <input
             id="recurring-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g. Rent, Salary, Netflix"
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
           />
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="recurring-amount">
-            Amount
+            {t('amount')}
           </label>
           <input
             id="recurring-amount"
@@ -128,13 +129,13 @@ export function RecurringItemForm({ onAdd }: RecurringItemFormProps) {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="font-numeric w-full rounded-lg border border-border px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
+            className="font-numeric w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
           />
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="recurring-day">
-            Day of month
+            {t('dayOfMonth')}
           </label>
           <input
             id="recurring-day"
@@ -143,25 +144,25 @@ export function RecurringItemForm({ onAdd }: RecurringItemFormProps) {
             max="31"
             value={dayOfMonth}
             onChange={(e) => setDayOfMonth(e.target.value)}
-            className="font-numeric w-full rounded-lg border border-border px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
+            className="font-numeric w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
           />
         </div>
 
         <div>
           <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="recurring-category">
-            Category
+            {t('category')}
           </label>
           <select
             id="recurring-category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             disabled={!type}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {!type && <option value="">Select a type first</option>}
+            {!type && <option value="">{t('selectTypeFirst')}</option>}
             {categories.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {categoryLabel(c, t)}
               </option>
             ))}
           </select>
@@ -169,14 +170,14 @@ export function RecurringItemForm({ onAdd }: RecurringItemFormProps) {
 
         <div className="col-span-2">
           <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="recurring-start">
-            Starting from
+            {t('startingFrom')}
           </label>
           <input
             id="recurring-start"
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
           />
         </div>
       </div>
@@ -184,16 +185,16 @@ export function RecurringItemForm({ onAdd }: RecurringItemFormProps) {
       <div className="mt-4 flex gap-2">
         <button
           type="submit"
-          className="flex-1 rounded-lg bg-ink py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="flex-1 rounded-lg bg-ink py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 dark:text-bg"
         >
-          Add recurring item
+          {t('addRecurringItem')}
         </button>
         <button
           type="button"
           onClick={reset}
           className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-ink-muted hover:text-ink"
         >
-          Cancel
+          {t('cancel')}
         </button>
       </div>
     </form>

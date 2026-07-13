@@ -4,6 +4,8 @@ import type { TransactionType, Transaction } from '../lib/types';
 import type { TransactionInput } from '../lib/useTransactionsStore';
 import { todayKey } from '../lib/date';
 import { convertToHomeCurrency, formatCurrency } from '../lib/calculations';
+import { useTranslation } from '../lib/i18n';
+import { categoryLabel } from '../lib/categoryLabels';
 
 interface TransactionFormProps {
   onAdd: (input: TransactionInput) => void;
@@ -22,6 +24,7 @@ export function TransactionForm({
   onCancelEdit,
   homeCurrency,
 }: TransactionFormProps) {
+  const { t } = useTranslation();
   const isEditing = editingTransaction !== null;
 
   const [type, setType] = useState<TransactionType | null>(editingTransaction?.type ?? null);
@@ -119,7 +122,7 @@ export function TransactionForm({
               : 'bg-surface text-ink-muted border border-border hover:border-expense/40'
           }`}
         >
-          Expense
+          {t('expense')}
         </button>
         <button
           type="button"
@@ -130,13 +133,11 @@ export function TransactionForm({
               : 'bg-surface text-ink-muted border border-border hover:border-income/40'
           }`}
         >
-          Income
+          {t('income')}
         </button>
       </div>
       {showTypeWarning && (
-        <p className="mt-1.5 text-xs font-medium text-expense">
-          Please select Expense or Income before continuing.
-        </p>
+        <p className="mt-1.5 text-xs font-medium text-expense">{t('selectTypeWarning')}</p>
       )}
 
       <label className="mt-4 flex items-center gap-2 text-xs font-medium text-ink-muted">
@@ -146,7 +147,7 @@ export function TransactionForm({
           onChange={(e) => setUseForeignCurrency(e.target.checked)}
           className="h-3.5 w-3.5 rounded border-border"
         />
-        This was in a different currency
+        {t('differentCurrency')}
       </label>
 
       <div className="mt-3 grid grid-cols-2 gap-3">
@@ -154,13 +155,13 @@ export function TransactionForm({
           <>
             <div>
               <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="foreign-currency">
-                Currency
+                {t('currencyLabel')}
               </label>
               <select
                 id="foreign-currency"
                 value={foreignCurrency}
                 onChange={(e) => setForeignCurrency(e.target.value)}
-                className="w-full rounded-lg border border-border px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
               >
                 {CURRENCY_CODES.map((code) => (
                   <option key={code} value={code}>
@@ -171,7 +172,7 @@ export function TransactionForm({
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="foreign-amount">
-                Amount ({foreignCurrency})
+                {t('amountIn', { currency: foreignCurrency })}
               </label>
               <input
                 id="foreign-amount"
@@ -186,7 +187,7 @@ export function TransactionForm({
             </div>
             <div className="col-span-2">
               <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="exchange-rate">
-                Exchange rate (1 {foreignCurrency} = ? {homeCurrency})
+                {t('exchangeRateLabel', { foreign: foreignCurrency, home: homeCurrency })}
               </label>
               <input
                 id="exchange-rate"
@@ -208,7 +209,7 @@ export function TransactionForm({
         ) : (
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="amount">
-              Amount ({homeCurrency})
+              {t('amountIn', { currency: homeCurrency })}
             </label>
             <input
               id="amount"
@@ -225,7 +226,7 @@ export function TransactionForm({
 
         <div>
           <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="date">
-            Date
+            {t('date')}
           </label>
           <input
             id="date"
@@ -236,28 +237,28 @@ export function TransactionForm({
               setDate(e.target.value);
               setShowDateWarning(false);
             }}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
           />
           {showDateWarning && (
-            <p className="mt-1 text-xs font-medium text-expense">Date can't be in the future.</p>
+            <p className="mt-1 text-xs font-medium text-expense">{t('dateFutureWarning')}</p>
           )}
         </div>
 
         <div className="col-span-2">
           <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="category">
-            Category
+            {t('category')}
           </label>
           <select
             id="category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             disabled={!type}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {!type && <option value="">Select Expense or Income first</option>}
+            {!type && <option value="">{t('selectTypeFirst')}</option>}
             {categories.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {categoryLabel(c, t)}
               </option>
             ))}
           </select>
@@ -265,14 +266,14 @@ export function TransactionForm({
 
         <div className="col-span-2">
           <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="description">
-            Description (optional)
+            {t('descriptionOptional')}
           </label>
           <input
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g. Grocery run"
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink/40"
           />
         </div>
       </div>
@@ -280,9 +281,9 @@ export function TransactionForm({
       <div className="mt-4 flex gap-2">
         <button
           type="submit"
-          className="flex-1 rounded-lg bg-ink py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="flex-1 rounded-lg bg-ink py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 dark:text-bg"
         >
-          {isEditing ? 'Save changes' : 'Add transaction'}
+          {isEditing ? t('saveChanges') : t('addTransaction')}
         </button>
         {isEditing && (
           <button
@@ -290,7 +291,7 @@ export function TransactionForm({
             onClick={onCancelEdit}
             className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-ink-muted hover:text-ink"
           >
-            Cancel
+            {t('cancel')}
           </button>
         )}
       </div>

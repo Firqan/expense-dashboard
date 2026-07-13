@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { Transaction } from '../lib/types';
 import { formatCurrency } from '../lib/calculations';
+import { useTranslation } from '../lib/i18n';
+import { categoryLabel } from '../lib/categoryLabels';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -11,19 +13,21 @@ interface TransactionListProps {
 }
 
 function TransactionRow({
-  t,
+  tx,
   onDelete,
   onEdit,
   homeCurrency,
   isEditing,
 }: {
-  t: Transaction;
+  tx: Transaction;
   onDelete: (id: string) => void;
   onEdit: (transaction: Transaction) => void;
   homeCurrency: string;
   isEditing: boolean;
 }) {
+  const { t } = useTranslation();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const label = categoryLabel(tx.category, t);
 
   return (
     <li
@@ -32,24 +36,24 @@ function TransactionRow({
       }`}
     >
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-ink">{t.description || t.category}</p>
+        <p className="truncate text-sm font-medium text-ink">{tx.description || label}</p>
         <p className="text-xs text-ink-muted">
-          {t.category} &middot; {t.date}
-          {t.foreignCurrency && t.foreignAmount && (
+          {label} &middot; {tx.date}
+          {tx.foreignCurrency && tx.foreignAmount && (
             <span className="font-numeric">
               {' '}
-              &middot; {formatCurrency(t.foreignAmount, t.foreignCurrency)} &times; {t.exchangeRate}
+              &middot; {formatCurrency(tx.foreignAmount, tx.foreignCurrency)} &times; {tx.exchangeRate}
             </span>
           )}
         </p>
       </div>
       <span
         className={`font-numeric shrink-0 text-sm font-semibold ${
-          t.type === 'income' ? 'text-income' : 'text-expense'
+          tx.type === 'income' ? 'text-income' : 'text-expense'
         }`}
       >
-        {t.type === 'income' ? '+' : '-'}
-        {formatCurrency(t.amount, homeCurrency)}
+        {tx.type === 'income' ? '+' : '-'}
+        {formatCurrency(tx.amount, homeCurrency)}
       </span>
 
       <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
@@ -57,33 +61,33 @@ function TransactionRow({
           <>
             <button
               type="button"
-              onClick={() => onDelete(t.id)}
+              onClick={() => onDelete(tx.id)}
               className="rounded px-1.5 py-0.5 text-[11px] font-medium text-expense hover:underline"
             >
-              Confirm
+              {t('confirm')}
             </button>
             <button
               type="button"
               onClick={() => setConfirmingDelete(false)}
               className="rounded px-1.5 py-0.5 text-[11px] font-medium text-ink-muted hover:underline"
             >
-              Cancel
+              {t('cancel')}
             </button>
           </>
         ) : (
           <>
             <button
               type="button"
-              onClick={() => onEdit(t)}
-              aria-label={`Edit transaction: ${t.description || t.category}`}
+              onClick={() => onEdit(tx)}
+              aria-label={`Edit transaction: ${tx.description || tx.category}`}
               className="rounded p-1 text-ink-muted hover:text-ink"
             >
-              Edit
+              {t('edit')}
             </button>
             <button
               type="button"
               onClick={() => setConfirmingDelete(true)}
-              aria-label={`Delete transaction: ${t.description || t.category}`}
+              aria-label={`Delete transaction: ${tx.description || tx.category}`}
               className="rounded p-1 text-ink-muted hover:text-expense"
             >
               ✕
@@ -102,10 +106,12 @@ export function TransactionList({
   homeCurrency,
   editingId,
 }: TransactionListProps) {
+  const { t } = useTranslation();
+
   if (transactions.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border bg-surface p-8 text-center text-sm text-ink-muted">
-        No transactions yet. Add your first one above.
+        {t('noTransactionsYet')}
       </div>
     );
   }
@@ -113,14 +119,14 @@ export function TransactionList({
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
       <ul>
-        {transactions.map((t) => (
+        {transactions.map((tx) => (
           <TransactionRow
-            key={t.id}
-            t={t}
+            key={tx.id}
+            tx={tx}
             onDelete={onDelete}
             onEdit={onEdit}
             homeCurrency={homeCurrency}
-            isEditing={editingId === t.id}
+            isEditing={editingId === tx.id}
           />
         ))}
       </ul>

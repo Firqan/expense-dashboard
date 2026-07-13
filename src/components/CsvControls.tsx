@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { transactionsToCsv, csvToTransactions, downloadCsv, CsvParseError } from '../lib/csv';
 import type { Transaction } from '../lib/types';
+import { useTranslation } from '../lib/i18n';
 
 interface CsvControlsProps {
   transactions: Transaction[];
@@ -9,6 +10,7 @@ interface CsvControlsProps {
 }
 
 export function CsvControls({ transactions, onImport, makeId }: CsvControlsProps) {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ export function CsvControls({ transactions, onImport, makeId }: CsvControlsProps
       onImport(imported);
       setError(null);
     } catch (err) {
-      setError(err instanceof CsvParseError ? err.message : 'Could not read that file.');
+      setError(err instanceof CsvParseError ? err.message : t('csvReadError'));
     } finally {
       e.target.value = '';
     }
@@ -47,14 +49,14 @@ export function CsvControls({ transactions, onImport, makeId }: CsvControlsProps
           disabled={transactions.length === 0}
           className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-ink/40 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Export CSV
+          {t('exportCsv')}
         </button>
         <button
           type="button"
           onClick={handleImportClick}
           className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-ink/40"
         >
-          Import CSV
+          {t('importCsv')}
         </button>
         <input
           ref={fileInputRef}

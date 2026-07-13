@@ -1,12 +1,15 @@
 import type { Totals } from '../lib/types';
 import { formatCurrency } from '../lib/calculations';
+import { useTranslation } from '../lib/i18n';
 
 export function SummaryCards({ totals, currency }: { totals: Totals; currency: string }) {
+  const { t } = useTranslation();
+
   const cards = [
-    { label: 'Income', value: totals.income, color: 'text-income' },
-    { label: 'Expenses', value: totals.expense, color: 'text-expense' },
+    { label: t('income'), value: totals.income, color: 'text-income' },
+    { label: t('expenses'), value: totals.expense, color: 'text-expense' },
     {
-      label: 'Balance',
+      label: t('balance'),
       value: totals.balance,
       color: totals.balance >= 0 ? 'text-income' : 'text-expense',
     },
