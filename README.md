@@ -48,7 +48,6 @@ CSV parsing (`src/lib/csv.ts`) round-trips through the same format it exports, a
 ## Possible extensions
 
 - Budgets per category with over/under indicators
-- Multi-currency support
 - Cloud sync / multi-device
 
 ## License
