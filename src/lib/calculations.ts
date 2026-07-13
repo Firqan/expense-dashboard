@@ -52,7 +52,7 @@ export function monthlyTrend(transactions: Transaction[]): MonthlyTotal[] {
 
 export function formatCurrency(amount: number): string {
   const sign = amount < 0 ? '-' : '';
-  return `${sign}$${Math.abs(amount).toLocaleString(undefined, {
+  return `${sign}$${Math.abs(amount).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
