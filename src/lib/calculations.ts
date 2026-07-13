@@ -1,4 +1,5 @@
 import type { Transaction, Totals, CategoryTotal, MonthlyTotal } from './types';
+import { CURRENCIES, DEFAULT_CURRENCY } from './types';
 
 export function filterByDateRange(
   transactions: Transaction[],
@@ -50,10 +51,16 @@ export function monthlyTrend(transactions: Transaction[]): MonthlyTotal[] {
     .sort((a, b) => a.month.localeCompare(b.month));
 }
 
-export function formatCurrency(amount: number): string {
+export function formatCurrency(amount: number, currencyCode: string = DEFAULT_CURRENCY): string {
+  const symbol = CURRENCIES[currencyCode]?.symbol ?? currencyCode;
   const sign = amount < 0 ? '-' : '';
-  return `${sign}$${Math.abs(amount).toLocaleString('en-US', {
+  return `${sign}${symbol}${Math.abs(amount).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
+}
+
+/** Converts a foreign-currency amount into the home currency using the given rate. */
+export function convertToHomeCurrency(foreignAmount: number, exchangeRate: number): number {
+  return Math.round(foreignAmount * exchangeRate * 100) / 100;
 }

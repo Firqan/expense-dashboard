@@ -7,12 +7,18 @@ A clean, chart-driven dashboard for tracking income and expenses: category break
 ## Features
 
 - **Add income/expense entries** with category, amount, date, and an optional note
+- **Explicit type selection required** — Expense/Income is never pre-selected, so a transaction can't be logged as the wrong type by accident
+- **No future-dated transactions** — the date picker won't accept a date past today
+- **Edit any transaction** — fix a mistake without deleting and re-entering it from scratch
+- **Delete with confirmation** — a stray click can't wipe out an entry
+- **Multi-currency**: pick a home currency (persisted, changeable anytime) from a small selector in the header. For a purchase made in a different currency, toggle "This was in a different currency," enter the foreign amount and the exchange rate, and the app computes and stores the home-currency equivalent — while still showing the original amount and rate as a detail on that entry
+- **Recurring bills & income + a 30-day projection**: register anything that happens on a fixed day every month (rent, a paycheck, a subscription) and see how your balance is expected to move over the next 30 days, based on today's actual balance plus what's scheduled to land
 - **Category breakdown** — a donut chart per transaction type (spending vs. income)
 - **Monthly trend** — a bar chart comparing income and expense month over month
 - **Date-range filtering** — every chart, summary card, and list respects the selected range
 - **CSV import/export** — take your data out, or bulk-load transactions from a spreadsheet
 - **Persistence** via `localStorage` — no account, no backend
-- **Tested**: all the money math (totals, category grouping, monthly aggregation, CSV parsing) is pure functions with full unit test coverage, independent of the UI
+- **Tested**: all the money math (totals, category grouping, monthly aggregation, currency conversion, recurring-item projection, CSV parsing) is pure functions with full unit test coverage, independent of the UI
 - **CI/CD**: every push to `main` runs the test suite and deploys to GitHub Pages automatically
 
 ## Tech stack
@@ -27,7 +33,7 @@ npm run dev       # http://localhost:5173
 ```
 
 ```bash
-npm test           # 29 tests
+npm test           # 61 tests
 npm run build
 ```
 
@@ -41,7 +47,6 @@ CSV parsing (`src/lib/csv.ts`) round-trips through the same format it exports, a
 
 ## Possible extensions
 
-- Recurring transactions (rent, subscriptions)
 - Budgets per category with over/under indicators
 - Multi-currency support
 - Cloud sync / multi-device

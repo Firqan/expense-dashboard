@@ -19,6 +19,17 @@ function loadTransactions(): Transaction[] {
   }
 }
 
+export interface TransactionInput {
+  type: TransactionType;
+  amount: number;
+  category: string;
+  description: string;
+  date: string;
+  foreignCurrency?: string;
+  foreignAmount?: number;
+  exchangeRate?: number;
+}
+
 export function useTransactionsStore() {
   const [transactions, setTransactions] = useState<Transaction[]>(loadTransactions);
 
@@ -30,15 +41,13 @@ export function useTransactionsStore() {
     }
   }, [transactions]);
 
-  function addTransaction(input: {
-    type: TransactionType;
-    amount: number;
-    category: string;
-    description: string;
-    date: string;
-  }) {
+  function addTransaction(input: TransactionInput) {
     const newTransaction: Transaction = { id: makeId(), ...input };
     setTransactions((prev) => [newTransaction, ...prev]);
+  }
+
+  function updateTransaction(id: string, input: TransactionInput) {
+    setTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...input, id } : t)));
   }
 
   function deleteTransaction(id: string) {
@@ -49,5 +58,12 @@ export function useTransactionsStore() {
     setTransactions((prev) => [...imported, ...prev]);
   }
 
-  return { transactions, addTransaction, deleteTransaction, importTransactions, makeId };
+  return {
+    transactions,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+    importTransactions,
+    makeId,
+  };
 }

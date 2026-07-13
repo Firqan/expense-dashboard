@@ -5,6 +5,7 @@ import {
   groupByCategory,
   monthlyTrend,
   formatCurrency,
+  convertToHomeCurrency,
 } from './calculations';
 import type { Transaction } from './types';
 
@@ -108,5 +109,35 @@ describe('formatCurrency', () => {
 
   it('formats zero without a sign', () => {
     expect(formatCurrency(0)).toBe('$0.00');
+  });
+
+  it('uses the symbol for the given currency code', () => {
+    expect(formatCurrency(50, 'EUR')).toBe('€50.00');
+    expect(formatCurrency(50, 'TRY')).toBe('₺50.00');
+    expect(formatCurrency(50, 'GBP')).toBe('£50.00');
+  });
+
+  it('falls back to the currency code itself if unrecognized', () => {
+    expect(formatCurrency(10, 'XYZ')).toBe('XYZ10.00');
+  });
+
+  it('always uses en-US grouping/decimal conventions regardless of currency', () => {
+    // A comma for thousands and a period for decimals, even for currencies
+    // whose home locale would normally format the other way around.
+    expect(formatCurrency(1234.5, 'EUR')).toBe('€1,234.50');
+  });
+});
+
+describe('convertToHomeCurrency', () => {
+  it('multiplies the foreign amount by the exchange rate', () => {
+    expect(convertToHomeCurrency(50, 1.08)).toBe(54);
+  });
+
+  it('rounds to two decimal places', () => {
+    expect(convertToHomeCurrency(33.33, 1.1)).toBe(36.66);
+  });
+
+  it('returns 0 when the foreign amount is 0', () => {
+    expect(convertToHomeCurrency(0, 1.5)).toBe(0);
   });
 });

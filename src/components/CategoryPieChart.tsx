@@ -6,9 +6,10 @@ import { formatCurrency } from '../lib/calculations';
 interface CategoryPieChartProps {
   data: CategoryTotal[];
   title: string;
+  currency: string;
 }
 
-export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
+export function CategoryPieChart({ data, title, currency }: CategoryPieChartProps) {
   return (
     <div className="rounded-xl border border-border bg-surface p-5">
       <p className="text-sm font-semibold text-ink">{title}</p>
@@ -33,7 +34,7 @@ export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
                 <Cell key={entry.category} fill={colorForIndex(index)} stroke="none" />
               ))}
             </Pie>
-            <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+            <Tooltip formatter={(value) => formatCurrency(Number(value), currency)} />
             <Legend
               layout="vertical"
               align="right"

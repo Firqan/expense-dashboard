@@ -1,7 +1,7 @@
 import type { Totals } from '../lib/types';
 import { formatCurrency } from '../lib/calculations';
 
-export function SummaryCards({ totals }: { totals: Totals }) {
+export function SummaryCards({ totals, currency }: { totals: Totals; currency: string }) {
   const cards = [
     { label: 'Income', value: totals.income, color: 'text-income' },
     { label: 'Expenses', value: totals.expense, color: 'text-expense' },
@@ -18,7 +18,7 @@ export function SummaryCards({ totals }: { totals: Totals }) {
         <div key={card.label} className="rounded-xl border border-border bg-surface p-5">
           <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">{card.label}</p>
           <p className={`font-numeric mt-1 text-2xl font-bold ${card.color}`}>
-            {formatCurrency(card.value)}
+            {formatCurrency(card.value, currency)}
           </p>
         </div>
       ))}
