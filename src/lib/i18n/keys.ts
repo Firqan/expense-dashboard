@@ -85,4 +85,12 @@ export type TranslationKey =
   | 'footerNote'
   | 'csvReadError'
   | 'day'
-  | 'night';
+  | 'night'
+  | 'cycleStartDayLabel'
+  | 'statementHistory'
+  | 'statementHistoryDescription'
+  | 'openingBalance'
+  | 'closingBalance'
+  | 'noStatementsYet'
+  | 'transactionsCount'
+  | 'exportExcel';

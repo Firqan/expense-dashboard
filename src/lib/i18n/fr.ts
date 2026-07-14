@@ -67,4 +67,13 @@ export const fr: Record<TranslationKey, string> = {
   csvReadError: "Impossible de lire ce fichier.",
   day: 'Jour',
   night: 'Nuit',
+  cycleStartDayLabel: 'Jour de relevé',
+  statementHistory: 'Historique des relevés',
+  statementHistoryDescription:
+    "Regroupé selon votre cycle de relevé plutôt que le mois calendaire, pour qu'un versement de salaire en milieu de mois ne coupe pas en deux périodes.",
+  openingBalance: 'Solde initial',
+  closingBalance: 'Solde final',
+  noStatementsYet: "Aucun relevé pour l'instant — ajoutez une transaction pour voir votre première période ici.",
+  transactionsCount: '{count} transactions',
+  exportExcel: 'Exporter en Excel',
 };

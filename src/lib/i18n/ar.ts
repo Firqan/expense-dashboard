@@ -67,4 +67,13 @@ export const ar: Record<TranslationKey, string> = {
   csvReadError: 'تعذّرت قراءة هذا الملف.',
   day: 'نهار',
   night: 'ليل',
+  cycleStartDayLabel: 'يوم الكشف',
+  statementHistory: 'سجل الكشوف',
+  statementHistoryDescription:
+    'مُجمّعة حسب دورة الكشف الخاصة بك بدلاً من الشهر التقويمي، حتى لا ينقسم يوم الراتب في منتصف الشهر إلى فترتين.',
+  openingBalance: 'الرصيد الافتتاحي',
+  closingBalance: 'الرصيد الختامي',
+  noStatementsYet: 'لا توجد كشوف بعد — أضف عملية لترى فترتك الأولى هنا.',
+  transactionsCount: '{count} عملية',
+  exportExcel: 'تصدير Excel',
 };

@@ -1,4 +1,5 @@
 import { CURRENCIES } from '../lib/types';
+import { useTranslation } from '../lib/i18n';
 
 interface CurrencySelectorProps {
   currency: string;
@@ -6,9 +7,11 @@ interface CurrencySelectorProps {
 }
 
 export function CurrencySelector({ currency, onChange }: CurrencySelectorProps) {
+  const { t } = useTranslation();
+
   return (
     <label className="flex items-center gap-1.5 text-xs text-ink-muted">
-      Currency
+      {t('currencyLabel')}
       <select
         value={currency}
         onChange={(e) => onChange(e.target.value)}

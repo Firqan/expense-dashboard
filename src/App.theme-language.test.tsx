@@ -2,10 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
+import { resetTransactionsDbForTests } from './lib/transactionsDb';
 
 describe('App — theme and language', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear();
+    await resetTransactionsDbForTests();
     document.documentElement.classList.remove('dark');
     document.documentElement.dir = 'ltr';
   });
@@ -49,6 +51,16 @@ describe('App — theme and language', () => {
 
     expect(screen.getByText('Gider Kontrol Paneli')).toBeInTheDocument();
     expect(screen.queryByText('Expense Dashboard')).not.toBeInTheDocument();
+  });
+
+  it('regression: translates the Currency selector label (was previously hardcoded English)', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.selectOptions(screen.getByLabelText(/^language$/i), 'ar');
+
+    expect(screen.getByText('العملة')).toBeInTheDocument();
+    expect(screen.queryByText('Currency')).not.toBeInTheDocument();
   });
 
   it('persists the language choice to localStorage', async () => {

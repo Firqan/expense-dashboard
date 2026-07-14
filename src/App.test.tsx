@@ -2,10 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
+import { getAllTransactions, resetTransactionsDbForTests } from './lib/transactionsDb';
 
 describe('App', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear();
+    await resetTransactionsDbForTests();
   });
 
   it('shows the empty state before any transaction is added', () => {
@@ -183,7 +185,7 @@ describe('App', () => {
     expect(screen.getAllByText('-$54.00').length).toBeGreaterThan(0);
   });
 
-  it('persists transactions to localStorage', async () => {
+  it('persists transactions to IndexedDB', async () => {
     const user = userEvent.setup();
     render(<App />);
 
@@ -192,7 +194,7 @@ describe('App', () => {
     await user.type(screen.getByLabelText(/description/i), 'Snack');
     await user.click(screen.getByRole('button', { name: /add transaction/i }));
 
-    const stored = JSON.parse(localStorage.getItem('expense-dashboard-transactions-v1') || '[]');
+    const stored = await getAllTransactions();
     expect(stored).toHaveLength(1);
     expect(stored[0].description).toBe('Snack');
   });

@@ -2,10 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
+import { resetTransactionsDbForTests } from './lib/transactionsDb';
 
 describe('App — planning', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear();
+    await resetTransactionsDbForTests();
   });
 
   it('hides the recurring items list until at least one is added', () => {

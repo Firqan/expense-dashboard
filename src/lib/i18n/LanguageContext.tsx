@@ -29,6 +29,26 @@ interface LanguageContextValue {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
+/**
+ * Looks at the browser/OS language preferences (e.g. "tr-TR", "ar-EG") and
+ * returns the first one that matches one of our supported languages, using
+ * just the primary subtag ("tr" out of "tr-TR"). Returns null if nothing
+ * the browser reports matches — the caller falls back to English.
+ */
+function detectBrowserLanguage(): LanguageCode | null {
+  if (typeof navigator === 'undefined') return null;
+
+  const candidates =
+    navigator.languages && navigator.languages.length > 0 ? navigator.languages : [navigator.language];
+
+  for (const raw of candidates) {
+    if (!raw) continue;
+    const primary = raw.toLowerCase().split('-')[0];
+    if (primary in DICTIONARIES) return primary as LanguageCode;
+  }
+  return null;
+}
+
 function loadLanguage(): LanguageCode {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -36,7 +56,9 @@ function loadLanguage(): LanguageCode {
   } catch {
     // ignore
   }
-  return DEFAULT_LANGUAGE;
+  // No explicit choice saved yet (first visit) — try the browser's own
+  // language before falling back to English.
+  return detectBrowserLanguage() ?? DEFAULT_LANGUAGE;
 }
 
 function interpolate(template: string, vars?: Record<string, string | number>): string {

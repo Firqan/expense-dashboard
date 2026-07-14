@@ -3,8 +3,10 @@ import { useTransactionsStore } from './lib/useTransactionsStore';
 import { useCurrency } from './lib/useCurrency';
 import { useRecurringStore } from './lib/useRecurringStore';
 import { useTheme } from './lib/useTheme';
+import { useCycleStartDay } from './lib/useCycleStartDay';
 import { filterByDateRange, calculateTotals, groupByCategory, monthlyTrend } from './lib/calculations';
 import { getUpcomingOccurrences, projectedBalance } from './lib/planning';
+import { groupTransactionsByPeriod } from './lib/periods';
 import { todayKey } from './lib/date';
 import type { Transaction } from './lib/types';
 import type { TransactionInput } from './lib/useTransactionsStore';
@@ -18,6 +20,8 @@ import { DateRangeFilter } from './components/DateRangeFilter';
 import { CsvControls } from './components/CsvControls';
 import { CurrencySelector } from './components/CurrencySelector';
 import { LanguageSelector } from './components/LanguageSelector';
+import { CycleDaySelector } from './components/CycleDaySelector';
+import { StatementHistory } from './components/StatementHistory';
 import { ThemeToggle } from './components/ThemeToggle';
 import { RecurringItemForm } from './components/RecurringItemForm';
 import { UpcomingList } from './components/UpcomingList';
@@ -32,10 +36,16 @@ function AppContent() {
   const { currency, setCurrency } = useCurrency();
   const { theme, toggleTheme } = useTheme();
   const { items: recurringItems, addRecurringItem, deleteRecurringItem } = useRecurringStore();
+  const { cycleStartDay, setCycleStartDay } = useCycleStartDay();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const formSectionRef = useRef<HTMLDivElement>(null);
+
+  const periods = useMemo(
+    () => groupTransactionsByPeriod(transactions, cycleStartDay),
+    [transactions, cycleStartDay]
+  );
 
   const filtered = useMemo(
     () => filterByDateRange(transactions, startDate || null, endDate || null),
@@ -90,12 +100,19 @@ function AppContent() {
             <p className="mt-1 max-w-md text-sm text-ink-muted">{t('appSubtitle')}</p>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <ThemeToggle theme={theme} onToggle={toggleTheme} />
-              <CsvControls transactions={transactions} onImport={importTransactions} makeId={makeId} />
+              <CsvControls
+                transactions={transactions}
+                periods={periods}
+                homeCurrency={currency}
+                onImport={importTransactions}
+                makeId={makeId}
+              />
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-end gap-3">
               <CurrencySelector currency={currency} onChange={setCurrency} />
+              <CycleDaySelector cycleStartDay={cycleStartDay} onChange={setCycleStartDay} />
               <LanguageSelector />
             </div>
           </div>
@@ -122,6 +139,14 @@ function AppContent() {
         </div>
 
         <MonthlyTrendChart data={trend} currency={currency} />
+
+        <div className="border-t border-border pt-6">
+          <h2 className="text-xl font-bold text-ink">{t('statementHistory')}</h2>
+          <p className="mt-1 max-w-xl text-sm text-ink-muted">{t('statementHistoryDescription')}</p>
+          <div className="mt-4">
+            <StatementHistory periods={periods} currency={currency} />
+          </div>
+        </div>
 
         <div ref={formSectionRef} className="grid gap-4 lg:grid-cols-[380px_1fr] scroll-mt-6">
           <TransactionForm

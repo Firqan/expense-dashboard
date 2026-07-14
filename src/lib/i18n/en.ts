@@ -67,4 +67,13 @@ export const en: Record<TranslationKey, string> = {
   csvReadError: 'Could not read that file.',
   day: 'Day',
   night: 'Night',
+  cycleStartDayLabel: 'Statement day',
+  statementHistory: 'Statement history',
+  statementHistoryDescription:
+    "Grouped by your statement cycle instead of the calendar month, so a payday in the middle of the month doesn't split across two periods.",
+  openingBalance: 'Opening balance',
+  closingBalance: 'Closing balance',
+  noStatementsYet: 'No statements yet — add a transaction to see your first period here.',
+  transactionsCount: '{count} transactions',
+  exportExcel: 'Export Excel',
 };

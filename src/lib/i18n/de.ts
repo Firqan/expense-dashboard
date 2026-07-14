@@ -67,4 +67,13 @@ export const de: Record<TranslationKey, string> = {
   csvReadError: 'Die Datei konnte nicht gelesen werden.',
   day: 'Tag',
   night: 'Nacht',
+  cycleStartDayLabel: 'Stichtag',
+  statementHistory: 'Abrechnungsverlauf',
+  statementHistoryDescription:
+    'Gruppiert nach deinem Abrechnungszyklus statt nach Kalendermonat, damit ein Gehaltseingang mitten im Monat nicht zwei Perioden zerteilt.',
+  openingBalance: 'Anfangssaldo',
+  closingBalance: 'Endsaldo',
+  noStatementsYet: 'Noch keine Abrechnungen — füge eine Buchung hinzu, um deine erste Periode hier zu sehen.',
+  transactionsCount: '{count} Buchungen',
+  exportExcel: 'Excel exportieren',
 };

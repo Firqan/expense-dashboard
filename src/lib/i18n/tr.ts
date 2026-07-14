@@ -67,4 +67,13 @@ export const tr: Record<TranslationKey, string> = {
   csvReadError: 'Bu dosya okunamadı.',
   day: 'Gündüz',
   night: 'Gece',
+  cycleStartDayLabel: 'Ekstre günü',
+  statementHistory: 'Ekstre geçmişi',
+  statementHistoryDescription:
+    'Takvim ayı yerine senin ekstre dönüne göre gruplanır, böylece ay ortasındaki maaş günü iki döneme bölünmez.',
+  openingBalance: 'Devreden bakiye',
+  closingBalance: 'Dönem sonu bakiye',
+  noStatementsYet: 'Henüz ekstre yok — ilk dönemini burada görmek için bir işlem ekle.',
+  transactionsCount: '{count} işlem',
+  exportExcel: "Excel'e aktar",
 };

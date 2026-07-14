@@ -67,4 +67,13 @@ export const ku: Record<TranslationKey, string> = {
   csvReadError: 'Ev dosya nehat xwendin.',
   day: 'Roj',
   night: 'Şev',
+  cycleStartDayLabel: 'Roja ekstreyê',
+  statementHistory: 'Dîroka ekstreyan',
+  statementHistoryDescription:
+    'Li gorî dewra ekstreya te tê kombûn, ne li gorî meha salnameyê — ji ber vê yekê roja meaş ya nîvê mehê nabe du beş.',
+  openingBalance: 'Bakiya destpêkê',
+  closingBalance: 'Bakiya dawî',
+  noStatementsYet: 'Hê ekstre tune ye — ji bo dema xwe ya yekem li vir bibînî, muameleyekê zêde bike.',
+  transactionsCount: '{count} muamele',
+  exportExcel: 'Wekî Excel derxe',
 };

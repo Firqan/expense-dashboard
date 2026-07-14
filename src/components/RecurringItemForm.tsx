@@ -103,7 +103,7 @@ export function RecurringItemForm({ onAdd }: RecurringItemFormProps) {
         <p className="mt-1.5 text-xs font-medium text-expense">{t('selectTypeWarning')}</p>
       )}
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
           <label className="mb-1 block text-xs font-medium text-ink-muted" htmlFor="recurring-description">
             {t('name')}

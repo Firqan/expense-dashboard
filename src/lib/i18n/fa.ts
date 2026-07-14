@@ -67,4 +67,13 @@ export const fa: Record<TranslationKey, string> = {
   csvReadError: 'این فایل خوانده نشد.',
   day: 'روز',
   night: 'شب',
+  cycleStartDayLabel: 'روز صورت‌حساب',
+  statementHistory: 'تاریخچه صورت‌حساب',
+  statementHistoryDescription:
+    'بر اساس چرخه صورت‌حساب شما گروه‌بندی می‌شود نه ماه تقویمی، تا روز حقوق در میانه ماه به دو دوره تقسیم نشود.',
+  openingBalance: 'موجودی ابتدای دوره',
+  closingBalance: 'موجودی پایان دوره',
+  noStatementsYet: 'هنوز صورت‌حسابی وجود ندارد — یک تراکنش اضافه کنید تا اولین دوره خود را اینجا ببینید.',
+  transactionsCount: '{count} تراکنش',
+  exportExcel: 'خروجی Excel',
 };
